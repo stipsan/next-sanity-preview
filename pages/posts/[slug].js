@@ -15,7 +15,7 @@ import { CMS_NAME } from '../../lib/constants'
 import { postQuery, postSlugsQuery } from '../../lib/queries'
 import { urlForImage } from '../../lib/sanity'
 import { getClient, overlayDrafts, sanityClient } from '../../lib/sanity.server'
-import { sanityConfig } from '../lib/config'
+import { sanityConfig } from '../../lib/config'
 
 const PreviewMode = dynamic(() => import('next-sanity/preview'))
 
