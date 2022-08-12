@@ -11,27 +11,21 @@ import Layout from '../../components/layout'
 import PostTitle from '../../components/post-title'
 import { CMS_NAME } from '../../lib/constants'
 import { postQuery, postSlugsQuery } from '../../lib/queries'
-import { urlForImage, usePreviewSubscription } from '../../lib/sanity'
-import { sanityClient, getClient, overlayDrafts } from '../../lib/sanity.server'
+import { urlForImage } from '../../lib/sanity'
+import { sanityClient, getClient } from '../../lib/sanity.server'
 
-export default function Post({ data = {}, preview }) {
+export default function Post({ data = {} }) {
   const router = useRouter()
 
   const slug = data?.post?.slug
-  const {
-    data: { post, morePosts },
-  } = usePreviewSubscription(postQuery, {
-    params: { slug },
-    initialData: data,
-    enabled: preview && slug,
-  })
+  const { post, morePosts } = data
 
   if (!router.isFallback && !slug) {
     return <ErrorPage statusCode={404} />
   }
 
   return (
-    <Layout preview={preview}>
+    <Layout>
       <Container>
         <Header />
         {router.isFallback ? (
@@ -72,17 +66,16 @@ export default function Post({ data = {}, preview }) {
   )
 }
 
-export async function getStaticProps({ params, preview = false }) {
-  const { post, morePosts } = await getClient(preview).fetch(postQuery, {
+export async function getStaticProps({ params }) {
+  const { post, morePosts } = await getClient(false).fetch(postQuery, {
     slug: params.slug,
   })
 
   return {
     props: {
-      preview,
       data: {
         post,
-        morePosts: overlayDrafts(morePosts),
+        morePosts,
       },
     },
     // If webhooks isn't setup then attempt to re-generate in 1 minute intervals
