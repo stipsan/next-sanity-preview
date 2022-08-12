@@ -2,8 +2,12 @@ import { postBySlugQuery } from '../../lib/queries'
 import { previewClient } from '../../lib/sanity.server'
 
 function redirectToPreview(res, Location) {
-  // Enable Preview Mode by setting the cookies
-  res.setPreviewData({})
+  const token = process.env.SANITY_API_PREVIEW_TOKEN
+  if (!token) {
+    throw new TypeError(`Missing SANITY_API_PREVIEW_TOKEN`)
+  }
+  // Set the token in the preview cookie to enable non-chrome browsers
+  res.setPreviewData({ token })
   // Redirect to a preview capable route
   res.writeHead(307, { Location })
   res.end()
@@ -19,6 +23,7 @@ export default async function preview(req, res) {
   if (secret && req.query.secret !== secret) {
     return res.status(401).json({ message: 'Invalid secret' })
   }
+
   // If no slug is provided open preview mode on the frontpage
   if (!req.query.slug) {
     return redirectToPreview(res, '/')
