@@ -19,7 +19,7 @@ import { sanityConfig } from '../../lib/config'
 
 const PreviewMode = dynamic(() => import('next-sanity/preview'))
 
-export default function Post({ data: initialData = {}, preview }) {
+export default function Post({ data: initialData = {}, preview, token }) {
   const router = useRouter()
   const [data, setData] = useState(initialData)
 
