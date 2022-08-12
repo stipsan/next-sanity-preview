@@ -1,6 +1,5 @@
-import dynamic from 'next/dynamic'
 import Head from 'next/head'
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import Container from '../components/container'
 import HeroPost from '../components/hero-post'
 import Intro from '../components/intro'
@@ -11,7 +10,7 @@ import { CMS_NAME } from '../lib/constants'
 import { indexQuery } from '../lib/queries'
 import { getClient, overlayDrafts } from '../lib/sanity.server'
 
-const PreviewMode = dynamic(() => import('next-sanity/preview'))
+const PreviewMode = lazy(() => import('next-sanity/preview'))
 
 export default function Index({ allPosts: initialAllPosts, preview, token }) {
   const [allPosts, setPosts] = useState(initialAllPosts)
@@ -19,14 +18,16 @@ export default function Index({ allPosts: initialAllPosts, preview, token }) {
   return (
     <>
       {preview && (
-        <PreviewMode
-          projectId={sanityConfig.projectId}
-          dataset={sanityConfig.dataset}
-          initial={initialAllPosts}
-          query={indexQuery}
-          onChange={setPosts}
-          token={token}
-        />
+        <Suspense fallback={null}>
+          <PreviewMode
+            projectId={sanityConfig.projectId}
+            dataset={sanityConfig.dataset}
+            initial={initialAllPosts}
+            query={indexQuery}
+            onChange={setPosts}
+            token={token}
+          />
+        </Suspense>
       )}
       <Layout preview={preview}>
         <Head>

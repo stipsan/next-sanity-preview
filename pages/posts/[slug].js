@@ -1,8 +1,7 @@
-import dynamic from 'next/dynamic'
 import ErrorPage from 'next/error'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import Container from '../../components/container'
 import Header from '../../components/header'
 import Layout from '../../components/layout'
@@ -11,13 +10,13 @@ import PostBody from '../../components/post-body'
 import PostHeader from '../../components/post-header'
 import PostTitle from '../../components/post-title'
 import SectionSeparator from '../../components/section-separator'
+import { sanityConfig } from '../../lib/config'
 import { CMS_NAME } from '../../lib/constants'
 import { postQuery, postSlugsQuery } from '../../lib/queries'
 import { urlForImage } from '../../lib/sanity'
 import { getClient, overlayDrafts, sanityClient } from '../../lib/sanity.server'
-import { sanityConfig } from '../../lib/config'
 
-const PreviewMode = dynamic(() => import('next-sanity/preview'))
+const PreviewMode = lazy(() => import('next-sanity/preview'))
 
 export default function Post({ data: initialData = {}, preview, token }) {
   const router = useRouter()
@@ -33,15 +32,17 @@ export default function Post({ data: initialData = {}, preview, token }) {
   return (
     <>
       {preview && slug && (
-        <PreviewMode
-          projectId={sanityConfig.projectId}
-          dataset={sanityConfig.dataset}
-          initial={initialData}
-          query={postQuery}
-          onChange={setData}
-          token={token}
-          params={{ slug }}
-        />
+        <Suspense fallback={null}>
+          <PreviewMode
+            projectId={sanityConfig.projectId}
+            dataset={sanityConfig.dataset}
+            initial={initialData}
+            query={postQuery}
+            onChange={setData}
+            token={token}
+            params={{ slug }}
+          />
+        </Suspense>
       )}
       <Layout preview={preview}>
         <Container>
